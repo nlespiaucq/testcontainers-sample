@@ -9,6 +9,10 @@ on:
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: mcr.microsoft.com/mssql/server:2022-latest
     
     steps:
       - uses: actions/checkout@v3
