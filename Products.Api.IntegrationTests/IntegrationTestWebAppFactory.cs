@@ -10,34 +10,32 @@ namespace Application.IntegrationTests;
 
 public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly MsSqlContainer _dbContainer = new MsSqlBuilder()
-        .WithDatabase({ Password = "Strong_password_123!" })
-        .Build();
+    private readonly MsSqlContainer _dbContainer = new MsSqlBuilder().WithPassword("Strong_password_123!").Build();
 
-protected override void ConfigureWebHost(IWebHostBuilder builder)
-{
-    builder.ConfigureTestServices(services =>
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var descriptor = services
-            .SingleOrDefault(s => s.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
-
-        if (descriptor is not null)
+        builder.ConfigureTestServices(services =>
         {
-            services.Remove(descriptor);
-        }
+            var descriptor = services
+                .SingleOrDefault(s => s.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
 
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(_dbContainer.GetConnectionString()));
-    });
-}
+            if (descriptor is not null)
+            {
+                services.Remove(descriptor);
+            }
 
-public Task InitializeAsync()
-{
-    return _dbContainer.StartAsync();
-}
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(_dbContainer.GetConnectionString()));
+        });
+    }
 
-public new Task DisposeAsync()
-{
-    return _dbContainer.StopAsync();
-}
+    public Task InitializeAsync()
+    {
+        return _dbContainer.StartAsync();
+    }
+
+    public new Task DisposeAsync()
+    {
+        return _dbContainer.StopAsync();
+    }
 }
