@@ -4,13 +4,11 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Products.Api;
-using Testcontainers.MsSql;
 
 namespace Application.IntegrationTests;
 
-public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
 {
-    private readonly MsSqlContainer _dbContainer = new MsSqlBuilder().WithPassword("Strong_password_123!").Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -25,17 +23,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
             }
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(_dbContainer.GetConnectionString()));
+                options.UseSqlServer("Server=products-db;User=sa;Password=Strong_password_123!;TrustServerCertificate=True"));
         });
-    }
-
-    public Task InitializeAsync()
-    {
-        return _dbContainer.StartAsync();
-    }
-
-    public new Task DisposeAsync()
-    {
-        return _dbContainer.StopAsync();
     }
 }

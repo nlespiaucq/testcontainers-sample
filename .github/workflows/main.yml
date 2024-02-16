@@ -2,9 +2,6 @@ name: Run Tests 🚀
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-    - main
 
 jobs:
   run-tests:
@@ -13,20 +10,20 @@ jobs:
     services:
       db:
         image: mcr.microsoft.com/mssql/server:2022-latest
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0.x'
-          
+          dotnet-version: "7.0.x"
+
       - name: Restore
         run: dotnet restore ./Products.Api.sln
-        
+
       - name: Build
         run: dotnet build ./Products.Api.sln --configuration Release --no-restore
-        
+
       - name: Test
         run: dotnet test ./Products.Api.sln --configuration Release --no-build
